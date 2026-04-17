@@ -1,5 +1,5 @@
 export interface SignUpResponse {
-    id: number;
+    id: string;
     // name: string;
     // description: string | null;
     email: string;

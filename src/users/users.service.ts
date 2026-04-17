@@ -29,7 +29,7 @@ constructor(private prisma: PrismaService) {}
     return await this.prisma.user.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.prisma.user.findUnique({
       where: {
         id,
@@ -37,7 +37,7 @@ constructor(private prisma: PrismaService) {}
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     return await this.prisma.user.update({
       where: {
         id,
@@ -46,7 +46,7 @@ constructor(private prisma: PrismaService) {}
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return await this.prisma.user.delete({
       where: {
         id,

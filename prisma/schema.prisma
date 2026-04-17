@@ -7,19 +7,25 @@ datasource db {
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
+  id       String @id @default(uuid())
   email       String  @unique
   name        String
   password    String
   description String?
   posts       Post[]
+  role     Role   @default(USER)
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Post {
   id        Int     @id @default(autoincrement())
   title     String
   published Boolean @default(false)
-  authorId  Int?
+  authorId  String?
   content   String?
   author    User?   @relation(fields: [authorId], references: [id])
 }
