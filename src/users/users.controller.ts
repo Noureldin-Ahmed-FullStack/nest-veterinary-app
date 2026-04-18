@@ -3,8 +3,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user-dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { OwnerOrAdminGuard } from 'src/auth/guards/role.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
