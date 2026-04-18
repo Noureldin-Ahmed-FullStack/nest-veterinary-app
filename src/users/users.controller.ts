@@ -12,6 +12,10 @@ export class UsersController {
     return this.usersService.registerUser(createUserDto);
   }
 
+  @Get('test')
+  testUnknownError() {
+    throw new Error('This is a plain JS error');
+  }
   @Get()
   findAll() {
     return this.usersService.findAll();

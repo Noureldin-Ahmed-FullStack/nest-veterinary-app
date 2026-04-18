@@ -25,6 +25,23 @@ constructor(private prisma: PrismaService) {}
   async encryptPassword(painPassword: string) {
     return await bcrypt.hash(painPassword, 10);
   }
+
+  async loginUser(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      return null;
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return null;
+    }
+    return user;
+  }
+
   async findAll() {
     return await this.prisma.user.findMany();
   }
