@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -72,8 +73,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // ✅ Handle known HTTP exceptions
     let message: any = 'Internal server error';
-    // let status = exception.code();
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
     if (exception instanceof HttpException) {
+      status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
       if (typeof exceptionResponse === 'string') {
@@ -81,11 +83,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       } else {
         message = (exceptionResponse as any).message || message;
       }
+    }else{
+        message = (exception as any)?.message || message;
     }
 
-
-    return response.status(500).json({
-      statusCode: 500,
+    return response.status(status).json({
+      statusCode: status,
       message,
       timestamp,
       exception: isDev ? exception : undefined,
