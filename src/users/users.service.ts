@@ -51,7 +51,15 @@ export class UsersService {
   // }
 
   async findAll() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        description: true,
+      },
+    });
   }
 
   async findOne(id: string) {
@@ -59,6 +67,7 @@ export class UsersService {
       where: {
         id,
       },
+      select: { id: true, name: true, email: true, role: true, description: true },
     });
   }
 
@@ -74,7 +83,7 @@ export class UsersService {
     });
   }
 
-  async remove(id: string ) {
+  async remove(id: string) {
     // if (req.user.sub !== id && req.user.role !== 'ADMIN') {
     //   throw new UnauthorizedException('You are not the owner of this user');
     // }

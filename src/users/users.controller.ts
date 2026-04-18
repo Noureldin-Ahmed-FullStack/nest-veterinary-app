@@ -37,7 +37,6 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard,OwnerOrAdminGuard)
-  @UseGuards(OwnerOrAdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);

@@ -24,7 +24,7 @@ enum Role {
 }
 
 model Post {
-  id        Int     @id @default(autoincrement())
+  id        String @id @default(uuid())
   title     String
   authorId  String?
   content   String?
