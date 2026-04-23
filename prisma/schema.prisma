@@ -13,10 +13,24 @@ model User {
   password    String
   description String?
   posts       Post[]
+  pets       Pet[]
   role     Role   @default(USER)
   dateCreated DateTime @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
 }
+model Pet {
+  id        String @id @default(uuid())
+  name     String
+  age  Int
+  pfp  String?
+  type   String
+  breed   String
+  ownerId  String?
+  owner    User?   @relation(fields: [ownerId], references: [id])
+  dateCreated DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
+}
+
 
 enum Role {
   USER

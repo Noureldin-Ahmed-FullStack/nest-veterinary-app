@@ -12,8 +12,9 @@ export class OwnerOrAdminGuard implements CanActivate {
     
     const user = req.user;
     const targetId = req.params.id;
+    const targetOwnerId = req.query.ownerId;
 
-    const isOwner = user.sub === targetId;
+    const isOwner = user.sub === targetId || user.sub === targetOwnerId;
     const isAdmin = user.role === 'ADMIN';
 
     if (!isOwner && !isAdmin) {
