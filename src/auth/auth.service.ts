@@ -5,10 +5,15 @@ import { LoginUserDto } from './dto/login-user-dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { redisClient } from '../redis/redis.client';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
   async registerUser(body: RegisterUserDto): Promise<SignUpResponse> {
     if (body.password !== body.repassword) {
       throw new Error('Passwords do not match');
@@ -45,10 +50,27 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const jti = randomUUID();
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      jti: jti,
+    };
+    const sessionKey = `session:${user.id}:${jti}`;
+    await redisClient.set(sessionKey, 'valid', {
+      EX: 60 * 60 * 24,
+    });
     return {
       message: 'Login successful',
       access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+  async logoutUser(userId: string, jti: string) {
+    const sessionKey = `session:${userId}:${jti}`;
+    await redisClient.del(sessionKey);
+    return {
+      message: 'Logout successful',
     };
   }
 }

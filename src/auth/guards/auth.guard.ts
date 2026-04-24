@@ -1,13 +1,16 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Observable } from 'rxjs';
+import { redisClient } from '../../redis/redis.client';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
-  async canActivate(
-    context: ExecutionContext,
-  ): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
     if (!authHeader) {
@@ -20,10 +23,16 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      // ✅ VERIFY TOKEN
+      
       const payload = await this.jwtService.verifyAsync(token);
 
-      // ✅ ATTACH USER TO REQUEST
+      const sessionKey = `session:${payload.sub}:${payload.jti}`;
+      const exists = await redisClient.get(sessionKey);
+      if (!exists) {
+        throw new UnauthorizedException('Session expired or revoked');
+      }
+      console.log(payload);
+      
       request.user = payload;
 
       return true;
