@@ -2,14 +2,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
+import { redisClient } from '../redis/redis.client';
+// import { CACHE_MANAGER } from '@nestjs/cache-manager';
+// import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    // private readonly redisService: RedisService,
   ) {}
   async create(userId: string, createPostDto: CreatePostDto) {
     return await this.prisma.post.create({
@@ -29,13 +30,11 @@ export class PostsService {
     });
   }
   async findAll() {
-    const cacheKey = 'products';
-    const cachedPosts = await this.cacheManager.get(cacheKey);
-    // console.log(cachedPosts);
+    const cached = await redisClient.get('products');
 
-    if (cachedPosts) {
+    if (cached) {
       console.log('Returning from cache');
-      return { cached: true ,products: cachedPosts};
+      return { cached: true, products: JSON.parse(cached) };
     }
     const products = await this.prisma.post.findMany({
       select: {
@@ -55,7 +54,9 @@ export class PostsService {
         },
       },
     });
-    await this.cacheManager.set(cacheKey, products, 60 * 1000); // Cache for 60 seconds
+    await redisClient.set('products', JSON.stringify(products), {
+      EX: 60, // cache for 60 seconds
+    });
     console.log('Returning from database');
     return { cached: false, products };
   }
