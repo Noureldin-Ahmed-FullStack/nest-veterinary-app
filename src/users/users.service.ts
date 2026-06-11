@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -51,6 +51,7 @@ export class UsersService {
   // }
 
   async findAll() {
+    Logger.log('Fetching all users');
     return await this.prisma.user.findMany({
       select: {
         id: true,
