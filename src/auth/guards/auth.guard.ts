@@ -23,7 +23,6 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      
       const payload = await this.jwtService.verifyAsync(token);
 
       const sessionKey = `session:${payload.sub}:${payload.jti}`;
@@ -32,8 +31,9 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Session expired or revoked');
       }
       // console.log(payload);
-      
+
       request.user = payload;
+      // remember to revoke token when user changes role or logs out, by deleting the session key from Redis
 
       return true;
     } catch (err) {

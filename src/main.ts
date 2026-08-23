@@ -29,7 +29,19 @@ async function bootstrap() {
     .addTag('veterinary')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('api', app, documentFactory, {
+  customCss: `
+    .swagger-ui .wrapper {
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+    }
+
+    .swagger-ui .information-container {
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+    }
+  `,
+});
 
   await app.listen(process.env.PORT ?? 3000);
 }
